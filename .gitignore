@@ -1,4 +1,10 @@
+#Idea stuff
+.idea
+statistics-collector.iml
+
+
 # Compiled class file
+target
 *.class
 
 # Log file
