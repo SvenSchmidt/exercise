@@ -3,51 +3,33 @@ package com.n26.exercise.statisticscollector.domain;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AutoSlidingStatisticsSamplesTest
+public class AutoSlidingStatisticsSamplesTest extends SchedulableSingleWorkerBaseTest
 {
 
   @Mock
   private SlidingStatisticsSamples delegate;
-  @Mock
-  private ScheduledExecutorService scheduledExecutorService;
 
-  @Captor
-  private ArgumentCaptor<Runnable> runnableCaptor;
-  @Captor
-  private ArgumentCaptor<Long> initialDelayCaptor;
-  @Captor
-  private ArgumentCaptor<Long> periodCaptor;
-  @Captor
-  private ArgumentCaptor<TimeUnit> timeUnitCaptor;
 
   AutoSlidingStatisticsSamples autoSlidingStatisticsSamples;
 
   Transaction transaction = new Transaction(1d, null);
   Collection<Transaction> transactions = Collections.singleton(transaction);
   private com.n26.exercise.statisticscollector.domain.Statistics statistics = new Statistics(12,6,6,6,2);
-
-
 
 
   @Before
@@ -89,32 +71,6 @@ public class AutoSlidingStatisticsSamplesTest
     verify(delegate).getStatistics();
   }
 
-  @Test
-  public void init() {
-    autoSlidingStatisticsSamples.init();
-
-    verify(scheduledExecutorService).scheduleAtFixedRate(runnableCaptor.capture(),
-                                                         initialDelayCaptor.capture(),
-                                                         periodCaptor.capture(),
-                                                         timeUnitCaptor.capture());
-
-    Runnable slider = runnableCaptor.getValue();
-    assertThat(slider, is(notNullValue()));
-    assertThat(slider instanceof AutoSlidingStatisticsSamples.Slider,is(true));
-
-    assertThat(initialDelayCaptor.getValue(),is(equalTo(3l)));
-    assertThat(periodCaptor.getValue(),is(equalTo(3l)));
-    assertThat(timeUnitCaptor.getValue(),is(equalTo(TimeUnit.SECONDS)));
-
-  }
-
-  @Test
-  public void destroy() {
-    autoSlidingStatisticsSamples.destroy();
-
-    verify(scheduledExecutorService).shutdownNow();
-
-  }
 
   @Test
   public void happyPath() {
@@ -125,12 +81,7 @@ public class AutoSlidingStatisticsSamplesTest
 
     autoSlidingStatisticsSamples.init();
 
-    try
-    {
-      Thread.sleep(60l);
-    } catch (Exception ex) {
-
-    }
+    sleepFor(60l);
 
     verify(delegate,atLeast(5)).slide();
 
@@ -138,5 +89,28 @@ public class AutoSlidingStatisticsSamplesTest
   }
 
 
+  @Override protected SchedulableSingleWorker getInstance()
+  {
+    return autoSlidingStatisticsSamples;
+  }
 
+  @Override protected Class<? extends Runnable> getRunnableClass()
+  {
+    return AutoSlidingStatisticsSamples.Slider.class;
+  }
+
+  @Override protected long getInitialDelay()
+  {
+    return 3;
+  }
+
+  @Override protected long getPeriod()
+  {
+    return 3;
+  }
+
+  @Override protected TimeUnit getTimeUnit()
+  {
+    return TimeUnit.SECONDS;
+  }
 }

@@ -4,27 +4,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class AsyncSlidingStatisticsSamples extends SchedulableSingleWorker implements SlidingStatisticsSamples
+public class AsyncTransactionUpdaterStatisticsSamples extends SchedulableSingleWorker
+    implements SlidingStatisticsSamples
 {
-  private final static Logger logger = LoggerFactory.getLogger(AsyncSlidingStatisticsSamples.class);
+  private final static Logger logger = LoggerFactory
+      .getLogger(AsyncTransactionUpdaterStatisticsSamples.class);
 
   private final SlidingStatisticsSamples delegate;
   private final BlockingQueue<Transaction> transactions;
 
-  public AsyncSlidingStatisticsSamples(SlidingStatisticsSamples delegate,
-                                       ScheduledExecutorService scheduledExecutorService,
-                                       long interval,
-                                       TimeUnit period,
-                                       int bufferSize)
+  public AsyncTransactionUpdaterStatisticsSamples(SlidingStatisticsSamples delegate,
+                                                  ScheduledExecutorService scheduledExecutorService,
+                                                  long interval,
+                                                  TimeUnit period,
+                                                  int bufferSize)
   {
-    super(scheduledExecutorService,interval,period);
+    super(scheduledExecutorService, interval, period);
     this.delegate = delegate;
     this.transactions = new LinkedBlockingQueue<>(bufferSize);
   }
@@ -33,10 +33,13 @@ public class AsyncSlidingStatisticsSamples extends SchedulableSingleWorker imple
   {
     try
     {
-      if(!transactions.offer(transaction, 50, TimeUnit.MILLISECONDS)) {
+      if (!transactions.offer(transaction, 50, TimeUnit.MILLISECONDS))
+      {
         throw new TransactionBufferFullException();
       }
-    } catch (InterruptedException ex) {
+    }
+    catch (InterruptedException ex)
+    {
       throw new InterruptedWhileAddingTransactionException();
     }
   }
@@ -62,20 +65,20 @@ public class AsyncSlidingStatisticsSamples extends SchedulableSingleWorker imple
 
   @Override protected Runnable getWorker()
   {
-    return null;
+    return new TransactionUpdater();
   }
 
-  class TransactionUpdater implements Runnable {
+  class TransactionUpdater implements Runnable
+  {
 
     @Override public void run()
     {
-      do {
-        Transaction transaction = transactions.poll();
-        if(transaction!=null) {
-          logger.info("Asynchronous adding transaction {}",transaction);
-          addTransaction(transaction);
-        }
-      } while(isRunning());
+      Transaction transaction = transactions.poll();
+      if (transaction != null)
+      {
+        logger.info("Asynchronous adding transaction {}", transaction);
+        delegate.addTransaction(transaction);
+      }
     }
   }
 

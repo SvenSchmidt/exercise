@@ -56,7 +56,6 @@ public class AutoSlidingStatisticsSamples extends SchedulableSingleWorker implem
     {
       try
       {
-        logger.info("Sliding samples");
         delegate.slide();
       }
       catch (Exception ex)
