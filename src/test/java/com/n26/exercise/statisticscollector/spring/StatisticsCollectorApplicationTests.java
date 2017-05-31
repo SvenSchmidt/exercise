@@ -1,4 +1,4 @@
-package com.n26.exercise.statisticscollector;
+package com.n26.exercise.statisticscollector.spring;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
