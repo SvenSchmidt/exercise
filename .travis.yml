@@ -1,6 +1,13 @@
 language: java
+
 jdk:
   - oraclejdk8
+
+notifications:
+  email:
+    recipients:
+      - filippomachi@gmail.com
+
 before_install:
   - mvn -N io.takari:maven:wrapper
   - chmod +x mvnw
