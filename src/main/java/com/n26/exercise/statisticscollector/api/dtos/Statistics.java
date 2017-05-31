@@ -1,5 +1,8 @@
 package com.n26.exercise.statisticscollector.api.dtos;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.math.BigDecimal;
 
 public class Statistics
@@ -10,7 +13,12 @@ public class Statistics
   final double min;
   final int count;
 
-  public Statistics(double sum, double avg, double max, double min, int count)
+  @JsonCreator
+  public Statistics(@JsonProperty("sum") double sum,
+                    @JsonProperty("avg") double avg,
+                    @JsonProperty("max") double max,
+                    @JsonProperty("min") double min,
+                    @JsonProperty("count") int count)
   {
     this.sum = sum;
     this.avg = avg;

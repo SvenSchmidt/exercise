@@ -71,7 +71,7 @@ public abstract class SchedulableSingleWorkerBaseTest
 
   protected abstract TimeUnit getTimeUnit();
 
-  protected void sleepFor(long howMuch)
+  public static void sleepFor(long howMuch)
   {
     try
     {
