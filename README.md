@@ -53,4 +53,4 @@ e.g. If maven is used, then  mvn clean install  should complete successfully.
 we could receive a transaction which have a timestamp of the past
 5) Make sure to send the case in memory solution without database (including
 in-memory database)
-6) Endpoints have to execute in constant time and memory (O(1))
+6) Endpoints have to execute in constant time and memory (O(1)) 
