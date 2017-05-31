@@ -22,4 +22,8 @@ public class Transaction
   {
     return timestamp;
   }
+
+  public static Transaction forAmount(double amount) {
+    return new Transaction(amount,new Date());
+  }
 }

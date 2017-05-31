@@ -3,6 +3,10 @@ package com.n26.exercise.statisticscollector.domain;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import static com.n26.exercise.statisticscollector.domain.Transaction.forAmount;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -62,12 +66,56 @@ public class StatisticsCalculatorTest
 
   }
 
+  @Test
+  public void oneTransactionWithCollection()
+  {
+
+    updateWithTransactionWithCollection(15.3);
+
+    assertStatisticsAre(1,
+                        15.3,
+                        15.3,
+                        15.3,
+                        15.3);
+
+  }
+
+  @Test
+  public void withManyTransactionWithCollection()
+  {
+
+    updateWithTransactionWithCollection(
+        15.6,
+        22.8,
+        45.9,
+        765.4,
+        234.53);
+
+    assertStatisticsAre(5,
+                        1084.23,
+                        216.846,
+                        15.6,
+                        765.4);
+
+  }
+
+
   private void updateWithTransaction(double... amounts)
   {
     for (double amount : amounts)
     {
-      calculator.update(new Transaction(amount, null));
+      calculator.update(forAmount(amount));
     }
+  }
+
+  private void updateWithTransactionWithCollection(double... amounts)
+  {
+    List<Transaction> transactionList = new LinkedList<>();
+    for (double amount : amounts)
+    {
+      transactionList.add(forAmount(amount));
+    }
+    calculator.update(transactionList);
   }
 
   private void assertStatisticsAre(int count,
@@ -77,13 +125,12 @@ public class StatisticsCalculatorTest
                                    double max)
   {
     Statistics statistics = calculator.getStatistics();
-    assertThat(statistics.getCount(), is(equalTo(count)));
-    assertThat(statistics.getSum(), is(equalTo(sum)));
-
-    assertThat(statistics.getAvg(), is(equalTo(avg)));
-
-    assertThat(statistics.getMin(), is(equalTo(min)));
-    assertThat(statistics.getMax(), is(equalTo(max)));
+    StatisticsChecker.assertStatisticsAre(statistics,
+                                          count,
+                                          sum,
+                                          avg,
+                                          min,
+                                          max);
   }
 
 }

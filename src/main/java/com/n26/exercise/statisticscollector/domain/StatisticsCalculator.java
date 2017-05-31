@@ -1,5 +1,7 @@
 package com.n26.exercise.statisticscollector.domain;
 
+import java.util.Collection;
+
 public class StatisticsCalculator
 {
   double sum =0.0;
@@ -13,6 +15,13 @@ public class StatisticsCalculator
                           max,
                           min,
                           count);
+  }
+
+  public synchronized void update(Collection<Transaction> transactions)
+  {
+    for(Transaction transaction:transactions) {
+      update(transaction);
+    }
   }
 
   public synchronized void update(Transaction transaction)
