@@ -2,7 +2,6 @@ package com.n26.exercise.statisticscollector.api.controllers;
 
 import com.n26.exercise.statisticscollector.api.dtos.Statistics;
 import com.n26.exercise.statisticscollector.domain.SlidingStatisticsSamples;
-import com.n26.exercise.statisticscollector.domain.StatisticsChecker;
 import com.n26.exercise.statisticscollector.domain.Transaction;
 import com.n26.exercise.statisticscollector.spring.StatisticsCollectorApplication;
 import org.junit.Test;
@@ -17,11 +16,10 @@ import static com.n26.exercise.statisticscollector.domain.SchedulableSingleWorke
 import static com.n26.exercise.statisticscollector.domain.StatisticsChecker.assertStatisticsAre;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = StatisticsCollectorApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-
 public class StatisticsControllerIT
 {
 
@@ -51,7 +49,7 @@ public class StatisticsControllerIT
     slidingStatisticsSamples.addTransaction(Transaction.forAmount(23.00));
     slidingStatisticsSamples.addTransaction(Transaction.forAmount(523.12));
 
-    sleepFor(50);
+    sleepFor(150);
 
     Statistics statistics = restTemplate.getForObject("/statistics", Statistics.class);
     assertThat(statistics,is(notNullValue()));
