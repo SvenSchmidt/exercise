@@ -43,4 +43,15 @@ public class Statistics
   {
     return count;
   }
+
+  @Override public String toString()
+  {
+    return "Statistics{" +
+        "sum=" + sum +
+        ", avg=" + avg +
+        ", max=" + max +
+        ", min=" + min +
+        ", count=" + count +
+        '}';
+  }
 }
