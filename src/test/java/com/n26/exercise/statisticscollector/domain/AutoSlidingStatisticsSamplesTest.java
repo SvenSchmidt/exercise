@@ -60,6 +60,15 @@ public class AutoSlidingStatisticsSamplesTest extends SchedulableSingleWorkerBas
   }
 
   @Test
+  public void resetStatistics()
+  {
+    autoSlidingStatisticsSamples.resetStatistics();
+
+    verify(delegate).resetStatistics();
+  }
+
+
+  @Test
   public void getStatistics() {
 
     when(delegate.getStatistics()).thenReturn(statistics);

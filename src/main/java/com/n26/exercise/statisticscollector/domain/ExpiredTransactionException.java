@@ -5,8 +5,8 @@ import java.util.Date;
 public class ExpiredTransactionException extends RuntimeException
 {
 
-  public ExpiredTransactionException(long unixEpoch, Date transactionDate)
+  public ExpiredTransactionException(UnixEpoch unixEpoch)
   {
-    super("Transaction timestamp ["+unixEpoch+","+transactionDate+"] is expired.");
+    super("Transaction timestamp ["+unixEpoch+"] is expired.");
   }
 }

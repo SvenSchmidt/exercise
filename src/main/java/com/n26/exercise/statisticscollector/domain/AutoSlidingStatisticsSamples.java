@@ -45,6 +45,11 @@ public class AutoSlidingStatisticsSamples extends SchedulableSingleWorker implem
     throw new UnsupportedOperationException("I am supposed to slide samples on my own :)");
   }
 
+  @Override public void resetStatistics()
+  {
+    delegate.resetStatistics();
+  }
+
   @Override protected Runnable getWorker()
   {
     return new Slider();

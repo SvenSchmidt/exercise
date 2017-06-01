@@ -1,11 +1,16 @@
 package com.n26.exercise.statisticscollector.domain;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class FixedSizeSlidingStatisticsSamples implements SlidingStatisticsSamples
 {
+  private final static Logger logger = LoggerFactory.getLogger(FixedSizeSlidingStatisticsSamples.class);
+
   LinkedList<StatisticsCalculator> statistics = new LinkedList<>();
   AtomicReference<StatisticsCalculator> firstItem = new AtomicReference<>();
 
@@ -18,7 +23,12 @@ public class FixedSizeSlidingStatisticsSamples implements SlidingStatisticsSampl
   {
     for (StatisticsCalculator statistics : statistics)
     {
-      statistics.update(transaction);
+      if(statistics.isAppliableToStatistics(transaction))
+      {
+        statistics.update(transaction);
+      } else {
+        break;
+      }
     }
   }
 
@@ -33,8 +43,19 @@ public class FixedSizeSlidingStatisticsSamples implements SlidingStatisticsSampl
   @Override public synchronized void slide()
   {
     statistics.pop();
-    statistics.add(new StatisticsCalculator());
+
+    StatisticsCalculator lastItem = statistics.peekLast();
+    statistics.add(new StatisticsCalculator(lastItem.getUnixEpoch().add(1)));
+
     refreshFirstItem();
+  }
+
+  @Override public synchronized void resetStatistics()
+  {
+    logger.info("Reset statistics.");
+    for(StatisticsCalculator statistics:statistics) {
+      statistics.clear();
+    }
   }
 
   @Override public Statistics getStatistics()
@@ -49,9 +70,11 @@ public class FixedSizeSlidingStatisticsSamples implements SlidingStatisticsSampl
 
   private void fillStatistics(int numberOfSamples)
   {
+    UnixEpoch unixEpoch = UnixEpoch.now();
     for (int i = 0; i < numberOfSamples; i++)
     {
-      statistics.add(new StatisticsCalculator());
+      UnixEpoch threshold = unixEpoch.add(1);
+      statistics.add(new StatisticsCalculator(threshold));
     }
     refreshFirstItem();
   }

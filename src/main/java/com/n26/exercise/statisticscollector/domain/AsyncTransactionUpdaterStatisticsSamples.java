@@ -63,6 +63,11 @@ public class AsyncTransactionUpdaterStatisticsSamples extends SchedulableSingleW
     delegate.slide();
   }
 
+  @Override public void resetStatistics()
+  {
+    delegate.resetStatistics();
+  }
+
   @Override protected Runnable getWorker()
   {
     return new TransactionUpdater();

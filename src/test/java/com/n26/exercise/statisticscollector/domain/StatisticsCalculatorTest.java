@@ -19,19 +19,17 @@ public class StatisticsCalculatorTest
   @Before
   public void setup()
   {
-    calculator = new StatisticsCalculator();
+    calculator = new StatisticsCalculator(UnixEpoch.now());
   }
 
   @Test
   public void noTransaction()
   {
-    assertStatisticsAre(0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0);
+    checkEmptyStatistics();
 
   }
+
+
 
   @Test
   public void oneTransaction()
@@ -77,6 +75,35 @@ public class StatisticsCalculatorTest
                         15.3,
                         15.3,
                         15.3);
+
+  }
+
+  @Test
+  public void oneTransactionExpired()
+  {
+
+    calculator.update(new Transaction(13.5,UnixEpoch.now().add(-61)));
+
+    checkEmptyStatistics();
+
+    calculator.update(new Transaction(13.5,UnixEpoch.now().add(-60)));
+
+    assertStatisticsAre(1,
+                        13.5,
+                        13.5,
+                        13.5,
+                        13.5);
+
+  }
+
+  @Test
+  public void isAppliableToStatistics()
+  {
+
+    assertThat(calculator.isAppliableToStatistics(new Transaction(13.5,UnixEpoch.now().add(-61))),is(false));
+
+    assertThat(calculator.isAppliableToStatistics(new Transaction(13.5,UnixEpoch.now().add(-60))),is(true));
+
 
   }
 
@@ -131,6 +158,15 @@ public class StatisticsCalculatorTest
                                           avg,
                                           min,
                                           max);
+  }
+
+  private void checkEmptyStatistics()
+  {
+    assertStatisticsAre(0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0);
   }
 
 }

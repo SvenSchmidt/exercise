@@ -19,7 +19,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = StatisticsCollectorApplication.class,webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = StatisticsCollectorApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class StatisticsControllerIT
 {
 
@@ -31,9 +31,10 @@ public class StatisticsControllerIT
   private SlidingStatisticsSamples slidingStatisticsSamples;
 
   @Test
-  public void initialEmptyStatistics() {
+  public void initialEmptyStatistics()
+  {
     Statistics statistics = restTemplate.getForObject("/statistics", Statistics.class);
-    assertThat(statistics,is(notNullValue()));
+    assertThat(statistics, is(notNullValue()));
     assertStatisticsAre(statistics,
                         0,
                         0.0,
@@ -43,7 +44,8 @@ public class StatisticsControllerIT
   }
 
   @Test
-  public void statisticsAfterSomeTransactions() {
+  public void statisticsAfterSomeTransactions()
+  {
 
     slidingStatisticsSamples.addTransaction(Transaction.forAmount(123.12));
     slidingStatisticsSamples.addTransaction(Transaction.forAmount(23.00));
@@ -52,7 +54,7 @@ public class StatisticsControllerIT
     sleepFor(150);
 
     Statistics statistics = restTemplate.getForObject("/statistics", Statistics.class);
-    assertThat(statistics,is(notNullValue()));
+    assertThat(statistics, is(notNullValue()));
     assertStatisticsAre(statistics,
                         3,
                         669.24,
@@ -61,4 +63,9 @@ public class StatisticsControllerIT
                         523.12);
   }
 
+  @Test
+  public void resetStatistics()
+  {
+    restTemplate.delete("/statistics");
+  }
 }

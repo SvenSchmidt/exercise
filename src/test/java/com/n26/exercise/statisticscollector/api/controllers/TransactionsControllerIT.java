@@ -4,6 +4,7 @@ import com.n26.exercise.statisticscollector.api.dtos.Event;
 import com.n26.exercise.statisticscollector.domain.SlidingStatisticsSamples;
 import com.n26.exercise.statisticscollector.domain.StatisticsChecker;
 import com.n26.exercise.statisticscollector.spring.StatisticsCollectorApplication;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,11 @@ public class TransactionsControllerIT
   @Autowired
   @Qualifier("slidingStatisticsSamples")
   private SlidingStatisticsSamples slidingStatisticsSamples;
+
+  @Before
+  public void setup() {
+    slidingStatisticsSamples.resetStatistics();
+  }
 
   @Test
   public void addTransaction201() {

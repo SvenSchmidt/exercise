@@ -1,17 +1,19 @@
 package com.n26.exercise.statisticscollector.domain;
 
-import java.time.Instant;
-import java.util.Date;
-
 public class Transaction
 {
   private final double amount;
-  private final Date timestamp;
+  private final UnixEpoch timestamp;
 
-  public Transaction(double amount, Date timestamp)
+  public Transaction(double amount, long timestamp)
+  {
+    this(amount,new UnixEpoch(timestamp));
+  }
+
+  public Transaction(double amount, UnixEpoch unixEpoch)
   {
     this.amount = amount;
-    this.timestamp = timestamp;
+    this.timestamp = unixEpoch;
   }
 
   public double getAmount()
@@ -19,21 +21,30 @@ public class Transaction
     return amount;
   }
 
-  public Date getTimestamp()
+  public UnixEpoch getTimestamp()
   {
     return timestamp;
   }
 
-  public static Transaction forAmount(double amount) {
-    return new Transaction(amount,new Date());
+  public boolean isValid() {
+    return !this.timestamp.isBeforeThan(60);
   }
 
-  public static Transaction of(double amount,long unixEpoch) {
-    Date transactionDate = Date.from(Instant.ofEpochSecond(unixEpoch));
-    if(System.currentTimeMillis()-transactionDate.getTime()>60000) {
-      throw new ExpiredTransactionException(unixEpoch,transactionDate);
+  public boolean isValid(UnixEpoch unixEpoch) {
+    return !this.timestamp.isBeforeThan(unixEpoch, 60);
+  }
+
+  public static Transaction forAmount(double amount) {
+    return new Transaction(amount,UnixEpoch.now());
+  }
+
+  public static Transaction of(double amount,long unixEpochAsLong) {
+    Transaction transaction = new Transaction(amount, unixEpochAsLong);
+    if(!transaction.isValid()) {
+      throw new ExpiredTransactionException(transaction.getTimestamp());
     }
-    return new Transaction(amount, transactionDate);
+
+    return transaction;
   }
 
 

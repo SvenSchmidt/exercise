@@ -11,4 +11,6 @@ public interface SlidingStatisticsSamples
   public Statistics getStatistics();
 
   public void slide();
+
+  public void resetStatistics();
 }

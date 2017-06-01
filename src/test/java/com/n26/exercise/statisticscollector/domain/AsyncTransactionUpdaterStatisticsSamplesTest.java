@@ -60,6 +60,15 @@ public class AsyncTransactionUpdaterStatisticsSamplesTest extends SchedulableSin
   }
 
   @Test
+  public void resetStatistics()
+  {
+    asyncTransactionUpdaterStatisticsSamples.resetStatistics();
+
+    verify(delegate).resetStatistics();
+  }
+
+
+  @Test
   public void addTransaction()
   {
     givenARealUpdater();
