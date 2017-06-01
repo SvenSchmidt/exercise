@@ -1,3 +1,43 @@
+****Solution
+This repository contains a solution to the problem listed below.
+The idea behind the solution is to have 1 item holding statistics for each second.
+So we will have a sliding window of 60 StatisticsCalculator that will be shifted by 
+an asynchronous thread.
+
+StatisticsCalculator istances has a threshold and could only accept transaction not older
+than 60 seconds comparing to the threshold.
+Synchronized operation on this class are the update of the statistics and the read operation
+that creates an immutable Statistics object.
+
+Above this object you have the collection of samples FixedSizeSlidingStatisticsSamples (60 StatisticsCalculator).
+Also in this case read and write operation are separated. You have an atomic reference to 
+the object holding the statistics for now and you have a list on which are performed two different
+operation (both synchronized):
+
+- window sliding
+- update of the transaction
+
+Then you have:
+
+- AutoSlidingStatisticsSamples: it's a decorator for the FixedSizeSlidingStatisticsSamples that
+schedule a thread for sliding the window of samples each second
+- AsyncTransactionUpdaterStatisticsSamples: it's a decorator for the FixedSizeSlidingStatisticsSamples.
+Valid transaction are queued in a queue and a thread is scheduled each time to pick up a transaction
+and update the statistics. In this way, when a transaction arrives it is parked in a queue (linked list).
+
+TODO:
+- improve AsyncTransactionUpdaterStatisticsSamples: the thread shouls awake periodically and consume
+a batch of transactions, not just one
+- adding a concurrent integration test
+- I integrated everything in travis for CI and I discoverd UnixEpoch test were dipendent on the
+Timezone, so I had to ignore it
+- Controllers use directly domain classes, maybe a usescase object would be great in both case
+RetrieveStatisticsUsecase -> FixedSizeSlidingStatisticsSamples
+UpdateStatisticsUsecase -> FixedSizeSlidingStatisticsSamples
+- I have some integration tests, they are not always launched
+
+
+
 ****Code Challenge:
 
 We would like to have a restful API for our statistics. 
