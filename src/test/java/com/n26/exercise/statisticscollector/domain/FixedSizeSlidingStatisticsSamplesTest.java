@@ -13,7 +13,9 @@ public class FixedSizeSlidingStatisticsSamplesTest
   @Before
   public void setup()
   {
-    fixedSizeSlidingStatisticsSamples = new FixedSizeSlidingStatisticsSamples(5);
+
+    fixedSizeSlidingStatisticsSamples
+        = new FixedSizeSlidingStatisticsSamples(5);
   }
 
   @Test
@@ -115,6 +117,63 @@ public class FixedSizeSlidingStatisticsSamplesTest
                                           0.0,
                                           0.0,
                                           0.0);
+  }
+
+  @Test
+  public void transactionsNotAppliableToAllTheSamples()
+  {
+    UnixEpoch now = UnixEpoch.now();
+
+    fixedSizeSlidingStatisticsSamples.addTransaction(
+        new Transaction(
+            3.5,
+            now.add(-40)
+        )
+    );
+    fixedSizeSlidingStatisticsSamples.addTransaction(
+        new Transaction(
+            123.15,
+            now.add(-58)
+        )
+    );
+    fixedSizeSlidingStatisticsSamples.addTransaction(
+        new Transaction(
+            88.5,
+            now.add(-57)
+        )
+    );
+    fixedSizeSlidingStatisticsSamples.addTransaction(
+        new Transaction(
+            23.5,
+            now.add(-60)
+        )
+    );
+
+    StatisticsChecker.assertStatisticsAre(fixedSizeSlidingStatisticsSamples.getStatistics(),
+                                          3,
+                                          215.15,
+                                          71.716666666666667,
+                                          3.5,
+                                          123.15);
+
+
+    fixedSizeSlidingStatisticsSamples.slide();
+
+    StatisticsChecker.assertStatisticsAre(fixedSizeSlidingStatisticsSamples.getStatistics(),
+                                          3,
+                                          215.15,
+                                          71.716666666666667,
+                                          3.5,
+                                          123.15);
+
+    fixedSizeSlidingStatisticsSamples.slide();
+
+    StatisticsChecker.assertStatisticsAre(fixedSizeSlidingStatisticsSamples.getStatistics(),
+                                          2,
+                                          92,
+                                          46,
+                                          3.5,
+                                          88.5);
   }
 
 }

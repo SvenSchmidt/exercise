@@ -70,10 +70,10 @@ public class FixedSizeSlidingStatisticsSamples implements SlidingStatisticsSampl
 
   private void fillStatistics(int numberOfSamples)
   {
-    UnixEpoch unixEpoch = UnixEpoch.now();
+    UnixEpoch threshold = UnixEpoch.now();
     for (int i = 0; i < numberOfSamples; i++)
     {
-      UnixEpoch threshold = unixEpoch.add(1);
+      threshold = threshold.add(1);
       statistics.add(new StatisticsCalculator(threshold));
     }
     refreshFirstItem();
